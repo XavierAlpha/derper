@@ -1,0 +1,32 @@
+name: Update Tailscale
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  update_tailscale:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update Tailscale
+        run: |
+          git submodule update --remote --recursive
+          git diff --quiet || git commit -am "Auto updated submodule references [skip ci]"
+        
+      - name: Push changes
+        if: success()
+        run: |
+          git config user.name 'Gitbot'
+          git config user.email 'bot@noreply.github.com'
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git push origin "${{ github.ref }}" || echo "No changes to push"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
