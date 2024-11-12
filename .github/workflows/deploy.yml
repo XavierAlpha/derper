@@ -43,4 +43,4 @@ jobs:
           tags: |
             camllia/derper:latest
             camllia/derper:${{github.sha}}
-            ghcr.io/XavierAlpha/derper:latest
+            ghcr.io/xavieralpha/derper:latest
