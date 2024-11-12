@@ -1,0 +1,46 @@
+name: tailscale derp disable hostname checking
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: rm_hostname
+        run: |
+          cd third_party/tailscale && sed -i '/hi.ServerName != m.hostname/,+2d' cmd/derper/cert.go
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Runs a single command using the runners shell
+      - name: Build and push Docker images to docker.io and ghcr.io
+        uses: docker/build-push-action@v6
+        with:
+          platforms: linux/amd64,linux/arm64
+          context: .
+          push: true
+          tags: |
+            camllia/derper:latest
+            camllia/derper:${{github.sha}}
+            ghcr.io/camllia/derper:latest
