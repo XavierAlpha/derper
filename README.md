@@ -15,14 +15,14 @@ docker run --restart=always \
 -e STUN_PORT=3478 \
 -e VERIFY_CLIENTS=true \
 -v /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock \
--d ghcr.io/camllia/derper:latest
+-d ghcr.io/xavieralpha/derper:latest
 ```
 
 ```yml
 # docker compose
 services:
   derper:
-    image: ghcr.io/camllia/derper
+    image: ghcr.io/xavieralpha/derper
     container_name: derper
     restart: always
     environment:
