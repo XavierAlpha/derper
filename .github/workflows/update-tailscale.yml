@@ -24,7 +24,7 @@ jobs:
           else
             git config --global user.name "Gitbot"
             git config --global user.email "bot@noreply.github.com"
-            git commit -am "Update tailscale to latest commit [skip ci]"
+            git commit -am "Update tailscale to latest commit"
             git push origin "${{ github.ref }}"
           fi
         env:

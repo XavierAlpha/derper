@@ -16,7 +16,7 @@ jobs:
       uses: peter-evans/dockerhub-description@v4
       with:
         username: ${{ vars.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        password: ${{ secrets.DOCKERHUB_TOKEN_ALL }}
         repository: camllia/derper
         short-description: ${{ github.event.repository.description }}
         enable-url-completion: true

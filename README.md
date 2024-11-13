@@ -117,30 +117,35 @@ analysis to diagnose the most tricky problems. There is no "plain text" or
 
 Now, this section contains additional content or modifications.
 
+> Image Source: camllia/derper:latest OR ghcr.io/xavieralpha/derper:latest
+
 ```sh
-# go /bin/sh
-docker pull ghcr.io/xavieralpha/derper:latest
-docker run --rm -it ghcr.io/xavieralpha/derper:latest /bin/sh
+# install tailscale if VERIFY_CLIENTS=true or omit
+curl -fsSL https://tailscale.com/install.sh | sh
+
+# test /bin/sh
+docker pull camllia/derper:latest
+docker run --rm -it camllia/derper /bin/sh
 ```
 
 ```sh
-# use
+# run
 docker run --restart=always \
--name derper -p 443:443 -p 3478:3478/udp \
+-name derper -p 80:80 -p 443:443 -p 3478:3478/udp \
 -e CERTMODE=manual \
 -e ADDR=:443 \
 -e STUN_PORT=3478 \
 -e VERIFY_CLIENTS=true \
 -v /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock \
--d ghcr.io/xavieralpha/derper:latest
+-d camllia/derper:latest
 # '-v /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock' Not necessary if VERIFY_CLIENTS=false
 ```
 
 ```yml
-# docker compose
+# run
 services:
   derper:
-    image: ghcr.io/xavieralpha/derper
+    image: camllia/derper
     container_name: derper
     restart: always
     environment:
@@ -149,6 +154,7 @@ services:
       - STUN_PORT=3478
       - VERIFY_CLIENTS=true
     ports:
+      - "80:80"
       - "443:443"
       - "3478:3478/udp"
     volumes:
