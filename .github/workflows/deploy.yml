@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'third_party/tailscale/cmd/derper/**'
+      - 'Dockerfile'
+      - 'entrypoint.sh'
 
 jobs:
   deploy:
@@ -33,7 +37,6 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Runs a single command using the runners shell
       - name: Build and push Docker images to docker.io and ghcr.io
         uses: docker/build-push-action@v6
         with:

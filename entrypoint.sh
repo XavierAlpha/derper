@@ -35,7 +35,7 @@ elif [ "$CERTMODE" = "manual" ]; then
         " > "$CONF_FILE"
         
         mkdir -p "$CERTDIR"
-        openssl req -x509 -nodes -days 730 -newkey rsa:2048 -keyout "$CERTDIR/$HOSTNAME.key" -out "$CERTDIR/$HOSTNAME.crt" -config "$CONF_FILE"
+        openssl req -x509 -nodes -quiet -days 730 -newkey rsa:2048 -keyout "$CERTDIR/$HOSTNAME.key" -out "$CERTDIR/$HOSTNAME.crt" -config "$CONF_FILE"
     fi
 
 else
