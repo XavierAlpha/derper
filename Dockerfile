@@ -31,21 +31,4 @@ EXPOSE 80
 EXPOSE 3478/UDP
 EXPOSE 443
 ENTRYPOINT ["/entrypoint.sh"]
-CMD [ "derper", \
-    "--a=$ADDR", \
-    "--c=$CONFIG", \
-    "--certdir=$CERTDIR", \
-    "--hostname=$HOSTNAME", \
-    "--certmode=$CERTMODE", \
-    "--derp=$RUNDERP", \
-    "--dev=$DEV", \
-    "--http-port=$HTTP_PORT", \
-    "--stun=$RUNSTUN", \
-    "--stun-port=$STUN_PORT", \
-    "--tcp-keepalive-time=$TCP_KEEPALIVE_TIME", \
-    "--tcp-user-timeout=$TCP_USER_TIMEOUT", \
-    "--verify-client-url=$VERIFY_CLIENT_URL", \
-    "--verify-client-url-fail-open=$VERIFY_CLIENT_URL_FAIL_OPEN", \
-    "--verify-clients=$VERIFY_CLIENTS", \
-    "--version=$VERSION" \
-    ]
+CMD [ "sh", "-c", "derper --a=$ADDR --c=$CONFIG --certdir=$CERTDIR --hostname=$HOSTNAME --certmode=$CERTMODE --derp=$RUNDERP --dev=$DEV --http-port=$HTTP_PORT --stun=$RUNSTUN --stun-port=$STUN_PORT --tcp-keepalive-time=$TCP_KEEPALIVE_TIME --tcp-user-timeout=$TCP_USER_TIMEOUT --verify-client-url=$VERIFY_CLIENT_URL --verify-client-url-fail-open=$VERIFY_CLIENT_URL_FAIL_OPEN --verify-clients=$VERIFY_CLIENTS --version=$VERSION" ]
