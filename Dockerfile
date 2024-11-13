@@ -45,7 +45,7 @@ CMD [ "derper", \
     "--tcp-keepalive-time=$TCP_KEEPALIVE_TIME", \
     "--tcp-user-timeout=$TCP_USER_TIMEOUT", \
     "--verify-client-url=$VERIFY_CLIENT_URL", \
-    "--verify-client-url-faile-open=$VERIFY_CLIENT_URL_FAIL_OPEN", \
+    "--verify-client-url-fail-open=$VERIFY_CLIENT_URL_FAIL_OPEN", \
     "--verify-clients=$VERIFY_CLIENTS", \
     "--version=$VERSION" \
     ]
