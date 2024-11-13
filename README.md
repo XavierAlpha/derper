@@ -1,4 +1,4 @@
-# DERP
+# DERP with Support for Pure IP
 > This section is adapted from Tailscale's README file.
 >
 > BSD 3-Clause License
@@ -114,10 +114,11 @@ analysis to diagnose the most tricky problems. There is no "plain text" or
   regular log entries are a good first indicator that there is a problem.
 
 # How To Use
+> Pure IP and VERIFY_CLIENTS=true
+> 
+> Image Source: camllia/derper:latest OR ghcr.io/xavieralpha/derper:latest
 
 Now, this section contains additional content or modifications.
-
-> Image Source: camllia/derper:latest OR ghcr.io/xavieralpha/derper:latest
 
 ```sh
 # install tailscale if VERIFY_CLIENTS=true or omit
