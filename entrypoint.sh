@@ -1,9 +1,9 @@
 #!/bin/sh
-if [ "$CERTMODE" = "letsencrypt" ]; then
+if [ "$CERT_MODE" = "letsencrypt" ]; then
     echo "使用 Let's Encrypt 获取证书, 请合理配置域名（跳过自建证书）"
-elif [ "$CERTMODE" = "manual" ]; then
+elif [ "$CERT_MODE" = "manual" ]; then
     echo "手动证书模式"
-    if [ -d "$CERTDIR" ] && [ -n "$(find "$CERTDIR" -name '*.crt' -o -name '*.key')" ]; then
+    if [ -d "$CERT_DIR" ] && [ -n "$(find "$CERT_DIR" -name '*.crt' -o -name '*.key')" ]; then
         echo "找到外部证书，使用映射的证书"
     else
         echo "没有找到外部证书，生成自签名证书"
@@ -34,12 +34,12 @@ elif [ "$CERTMODE" = "manual" ]; then
         IP.1 = $HOSTNAME
         " > "$CONF_FILE"
         
-        mkdir -p "$CERTDIR"
-        openssl req -x509 -nodes -quiet -days 730 -newkey rsa:2048 -keyout "$CERTDIR/$HOSTNAME.key" -out "$CERTDIR/$HOSTNAME.crt" -config "$CONF_FILE"
+        mkdir -p "$CERT_DIR"
+        openssl req -x509 -nodes -quiet -days 730 -newkey rsa:2048 -keyout "$CERT_DIR/$HOSTNAME.key" -out "$CERT_DIR/$HOSTNAME.crt" -config "$CONF_FILE"
     fi
 
 else
-    echo "未知的 CERTMODE 值：$CERTMODE"
+    echo "未知的 CERTMODE 环境变量: $CERT_MODE"
     exit 1
 fi
 

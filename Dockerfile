@@ -9,19 +9,25 @@ RUN cd /root/tailscale/cmd/derper && \
 FROM alpine:latest
 WORKDIR /root
 ENV DEV=false
-ENV VERSION=false
+ENV VERSION_FLAG=false
 ENV ADDR=":443"
 ENV HTTP_PORT=80
 ENV STUN_PORT=3478
-ENV CONFIG=""
-ENV CERTMODE="manual"
-ENV CERTDIR="derper-certs"
+ENV CONFIG_PATH=""
+ENV CERT_MODE="manual"
+ENV CERT_DIR="derper-certs"
 ENV HOSTNAME="127.0.0.1"
-ENV RUNSTUN=true
-ENV RUNDERP=true
+ENV RUN_STUN=true
+ENV RUN_DERP=true
+ENV MESH_PSKFILE=""
+ENV MESH_WITH=""
+ENV BOOTSTRAP_DNS=""
+ENV UNPUBLISHED_DNS=""
 ENV VERIFY_CLIENTS=true
 ENV VERIFY_CLIENT_URL=""
-ENV VERIFY_CLIENT_URL_FAIL_OPEN=true
+ENV VERIFY_FAIL_OPEN=true
+ENV ACCEPT_CONNECTION_LIMIT="+Inf"
+ENV ACCEPT_CONNECTION_BURST=9223372036854775807
 ENV TCP_KEEPALIVE_TIME="10m0s"
 ENV TCP_USER_TIMEOUT="15s"
 COPY --from=builder /root/derper /usr/local/bin/derper
@@ -31,4 +37,4 @@ EXPOSE 80
 EXPOSE 3478/UDP
 EXPOSE 443
 ENTRYPOINT ["/entrypoint.sh"]
-CMD [ "sh", "-c", "derper --a=$ADDR --c=$CONFIG --certdir=$CERTDIR --hostname=$HOSTNAME --certmode=$CERTMODE --derp=$RUNDERP --dev=$DEV --http-port=$HTTP_PORT --stun=$RUNSTUN --stun-port=$STUN_PORT --tcp-keepalive-time=$TCP_KEEPALIVE_TIME --tcp-user-timeout=$TCP_USER_TIMEOUT --verify-client-url=$VERIFY_CLIENT_URL --verify-client-url-fail-open=$VERIFY_CLIENT_URL_FAIL_OPEN --verify-clients=$VERIFY_CLIENTS --version=$VERSION" ]
+CMD [ "sh", "-c", "derper --a=$ADDR --accept-connection-limit=$ACCEPT_CONNECTION_LIMIT --accept-connection-burst=$ACCEPT_CONNECTION_BURST --bootstrap-dns-names=$BOOTSTRAP_DNS --c=$CONFIG_PATH --certdir=$CERT_DIR --certmode=$CERT_MODE --derp=$RUN_DERP --dev=$DEV --hostname=$HOSTNAME --http-port=$HTTP_PORT --mesh-psk-file=$MESH_PSKFILE --mesh-with=$MESH_WITH --stun=$RUN_STUN --stun-port=$STUN_PORT --tcp-keepalive-time=$TCP_KEEPALIVE_TIME --tcp-user-timeout=$TCP_USER_TIMEOUT --unpublished-bootstrap-dns-names=$UNPUBLISHED_DNS  --verify-client-url=$VERIFY_CLIENT_URL --verify-client-url-fail-open=$VERIFY_FAIL_OPEN --verify-clients=$VERIFY_CLIENTS --version=$VERSION_FLAG" ]

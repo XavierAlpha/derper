@@ -1,5 +1,86 @@
-# DERP with Support for Pure IP
-> This section is adapted from Tailscale's README file.
+# DERP in Docker
+
+## How To Use
+> Image Source: camllia/derper:latest OR ghcr.io/xavieralpha/derper:latest
+
+
+```sh
+# install tailscale if VERIFY_CLIENTS=true; otherwise, ignore it.
+curl -fsSL https://tailscale.com/install.sh | sh
+
+# if /bin/sh
+docker pull camllia/derper:latest
+docker run --rm -it camllia/derper /bin/sh
+```
+
+### DERP Server Environment Variables and Parameter Comparison Table
+
+This table provides a detailed comparison and command-line parameters for the `derper` server, making it easier to configure and understand each feature.
+
+| **Environment Variable**   | **derper Command Parameter**             | **Default Value**                     |
+|----------------------------|------------------------------------------|---------------------------------------|
+| DEV                        | `-dev`                                   | `false`                               |
+| VERSION_FLAG               | `-version`                               | `false`                               |
+| ADDR                       | `-a`                                     | `:443`                                |
+| HTTP_PORT                  | `-http-port`                             | `80`                                  |
+| STUN_PORT                  | `-stun-port`                             | `3478`                                |
+| CONFIG_PATH                | `-c`                                     | `""`                                  |
+| CERT_MODE                  | `-certmode`                              | `manual`                              |
+| CERT_DIR                   | `-certdir`                               | `derper-certs`                        |
+| HOSTNAME                   | `-hostname`                              | `127.0.0.1`                           |
+| RUN_STUN                   | `-stun`                                  | `true`                                |
+| RUN_DERP                   | `-derp`                                  | `true`                                |
+| MESH_PSKFILE               | `-mesh-psk-file`                         | `""`                                  |
+| MESH_WITH                  | `-mesh-with`                             | `""`                                  |
+| BOOTSTRAP_DNS              | `-bootstrap-dns-names`                   | `""`                                  |
+| UNPUBLISHED_DNS            | `-unpublished-bootstrap-dns-names`       | `""`                                  |
+| VERIFY_CLIENTS             | `-verify-clients`                        | `true`                                |
+| VERIFY_CLIENT_URL          | `-verify-client-url`                     | `""`                                  |
+| VERIFY_FAIL_OPEN           | `-verify-client-url-fail-open`           | `true`                                |
+| ACCEPT_CONNECTION_LIMIT    | `-accept-connection-limit`               | `+Inf`                                |
+| ACCEPT_CONNECTION_BURST    | `-accept-connection-burst`               | `9223372036854775807`                 |
+| TCP_KEEPALIVE_TIME         | `-tcp-keepalive-time`                    | `10m0s`                               |
+| TCP_USER_TIMEOUT           | `-tcp-user-timeout`                      | `15s`                                 |
+
+### RUN DERPER
+```sh
+# avoid SNI checks: Make sure certmode=manual and hostname is ip
+docker run --restart=unless-stopped \
+--name derper \
+# -p 80:80 -p 443:443 -p 3478:3478/udp \
+# -e CERT_MODE=manual \
+# -e HOSTNAME="127.0.0.1" \
+# -e ADDR=:443 \
+# -e STUN_PORT=3478 \
+# -e VERIFY_CLIENTS=true \
+-v /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock \
+-d camllia/derper:latest
+# '-v /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock' Not necessary if VERIFY_CLIENTS=false
+```
+
+```yml
+# avoid SNI checks: Make sure certmode=manual and hostname is ip
+services:
+  derper:
+    image: camllia/derper
+    container_name: derper
+    restart: unless-stopped
+    # environment:
+    #   - CERT_MODE=manual     # default
+    #   - HOSTNAME="127.0.0.1" # default
+    #   - ADDR=:443            # default
+    #   - STUN_PORT=3478       # default
+    #   - VERIFY_CLIENTS=true  # default
+    ports:
+      - "80:80"
+      - "443:443"
+      - "3478:3478/udp"
+    volumes:
+      - /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock # Not necessary if VERIFY_CLIENTS=false
+```
+
+# DERP
+> This section is from Tailscale's README file.
 >
 > BSD 3-Clause License
 > 
@@ -112,52 +193,3 @@ analysis to diagnose the most tricky problems. There is no "plain text" or
   unreachable or peers are regularly not reachable in their DERP home regions.
   There are many possible misconfiguration causes for these problems, but
   regular log entries are a good first indicator that there is a problem.
-
-# How To Use
-> Pure IP and VERIFY_CLIENTS=true
-> 
-> Image Source: camllia/derper:latest OR ghcr.io/xavieralpha/derper:latest
-
-Now, this section contains additional content or modifications.
-
-```sh
-# install tailscale if VERIFY_CLIENTS=true or omit
-curl -fsSL https://tailscale.com/install.sh | sh
-
-# test /bin/sh
-docker pull camllia/derper:latest
-docker run --rm -it camllia/derper /bin/sh
-```
-
-```sh
-# run
-docker run --restart=always \
--name derper -p 80:80 -p 443:443 -p 3478:3478/udp \
--e CERTMODE=manual \
--e ADDR=:443 \
--e STUN_PORT=3478 \
--e VERIFY_CLIENTS=true \
--v /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock \
--d camllia/derper:latest
-# '-v /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock' Not necessary if VERIFY_CLIENTS=false
-```
-
-```yml
-# run
-services:
-  derper:
-    image: camllia/derper
-    container_name: derper
-    restart: always
-    environment:
-      - CERTMODE=manual
-      - ADDR=:443
-      - STUN_PORT=3478
-      - VERIFY_CLIENTS=true
-    ports:
-      - "80:80"
-      - "443:443"
-      - "3478:3478/udp"
-    volumes:
-      - /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock # Not necessary if VERIFY_CLIENTS=false
-```
