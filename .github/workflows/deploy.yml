@@ -25,6 +25,7 @@ jobs:
             echo "trigger_type=workflow_run" >> $GITHUB_ENV
           else
             echo "trigger_type=others" >> $GITHUB_ENV
+          fi
       - name: Check for derper changes (Only for submodule updates)
         if: env.trigger_type == 'workflow_run'
         run: |
@@ -36,7 +37,7 @@ jobs:
           else
             echo "No deploy needed."
             exit 0
-
+          fi
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
