@@ -5,21 +5,37 @@ on:
     branches:
       - main
     paths:
-      - 'third_party/tailscale/cmd/derper/**'
       - 'Dockerfile'
       - 'entrypoint.sh'
-
+  workflow_run:
+    workflows: ["Update Tailscale"]
+    types:
+      - completed
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          submodules: true
+          submodules: recursive
 
-      - name: rm_hostname
+      - name: Trigger type
         run: |
-          cd third_party/tailscale && sed -i '/hi.ServerName != m.hostname/,+2d' cmd/derper/cert.go
+          if [ "${{ github.event_name }}" == "workflow_run" ]; then
+            echo "trigger_type=workflow_run" >> $GITHUB_ENV
+          else
+            echo "trigger_type=others" >> $GITHUB_ENV
+      - name: Check for derper changes (Only for submodule updates)
+        if: env.trigger_type == 'workflow_run'
+        run: |
+          git diff HEAD^ HEAD --quiet third_party/tailscale/cmd/derper/ && echo "trigger_deploy=false" >> $GITHUB_ENV || echo "trigger_deploy=true" >> $GITHUB_ENV
+      - name: Deploy if required
+        run: |
+          if [[ "$trigger_type" == "others" || "$trigger_deploy" == "true" ]]; then
+            echo "Deploying..."
+          else
+            echo "No deploy needed."
+            exit 0
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
