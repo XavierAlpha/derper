@@ -3,8 +3,12 @@ if [ "$CERT_MODE" = "letsencrypt" ]; then
     echo "使用 Let's Encrypt 获取证书, 请合理配置域名（跳过自建证书）"
 elif [ "$CERT_MODE" = "manual" ]; then
     echo "手动证书模式"
-    if [ -d "$CERT_DIR" ] && [ -n "$(find "$CERT_DIR" -name '*.crt' -o -name '*.key')" ]; then
+    if [ -f "$CERT_DIR/$HOSTNAME.crt" ] && [ -f "$CERT_DIR/$HOSTNAME.key" ]; then
         echo "找到外部证书，使用映射的证书"
+    else
+        echo "错误：$CERT_DIR 文件夹中未找到 $HOSTNAME.crt 和 $HOSTNAME.key 文件。"
+        exit 1
+    fi
     else
         echo "没有找到外部证书，生成自签名证书"
         CONF_FILE="ASN.conf"
