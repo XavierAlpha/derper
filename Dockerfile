@@ -23,7 +23,7 @@ ENV FLAGHOME=""
 ENV MESH_PSKFILE=""
 ENV MESH_WITH=""
 ENV SECRETS_URL=""
-ENV SECRET_PREFIX="prod/derp"
+ENV SECRETS_PREFIX="prod/derp"
 ENV SECRETS_CACHEDIR="derper-secrets"
 ENV BOOTSTRAP_DNS=""
 ENV UNPUBLISHED_DNS=""
@@ -43,4 +43,4 @@ EXPOSE 80
 EXPOSE 3478/UDP
 EXPOSE 443
 ENTRYPOINT ["/entrypoint.sh"]
-CMD [ "sh", "-c", "derper --a=$ADDR --accept-connection-limit=$ACCEPT_CONNECTION_LIMIT --accept-connection-burst=$ACCEPT_CONNECTION_BURST --bootstrap-dns-names=$BOOTSTRAP_DNS --c=$CONFIG_PATH --certdir=$CERT_DIR --certmode=$CERT_MODE --derp=$RUN_DERP --dev=$DEV --home=$FLAGHOME --hostname=$HOSTNAME --http-port=$HTTP_PORT --mesh-psk-file=$MESH_PSKFILE --mesh-with=$MESH_WITH --secrets-cache-dir=$SECRETS_CACHEDIR --secrets-path-prefix=$SECRET_PREFIX --secrets-url=$SECRETS_URL --socket=$SOCKET --stun=$RUN_STUN --stun-port=$STUN_PORT --tcp-keepalive-time=$TCP_KEEPALIVE_TIME --tcp-user-timeout=$TCP_USER_TIMEOUT --tcp-write-timeout=$TCP_WRITE_TIMEOUT --unpublished-bootstrap-dns-names=$UNPUBLISHED_DNS  --verify-client-url=$VERIFY_CLIENT_URL --verify-client-url-fail-open=$VERIFY_FAIL_OPEN --verify-clients=$VERIFY_CLIENTS --version=$VERSION_FLAG" ]
+CMD [ "sh", "-c", "derper --a=$ADDR --accept-connection-limit=$ACCEPT_CONNECTION_LIMIT --accept-connection-burst=$ACCEPT_CONNECTION_BURST --bootstrap-dns-names=$BOOTSTRAP_DNS --c=$CONFIG_PATH --certdir=$CERT_DIR --certmode=$CERT_MODE --derp=$RUN_DERP --dev=$DEV --home=$FLAGHOME --hostname=$HOSTNAME --http-port=$HTTP_PORT --mesh-psk-file=$MESH_PSKFILE --mesh-with=$MESH_WITH --secrets-cache-dir=$SECRETS_CACHEDIR --secrets-path-prefix=$SECRETS_PREFIX --secrets-url=$SECRETS_URL --socket=$SOCKET --stun=$RUN_STUN --stun-port=$STUN_PORT --tcp-keepalive-time=$TCP_KEEPALIVE_TIME --tcp-user-timeout=$TCP_USER_TIMEOUT --tcp-write-timeout=$TCP_WRITE_TIMEOUT --unpublished-bootstrap-dns-names=$UNPUBLISHED_DNS  --verify-client-url=$VERIFY_CLIENT_URL --verify-client-url-fail-open=$VERIFY_FAIL_OPEN --verify-clients=$VERIFY_CLIENTS --version=$VERSION_FLAG" ]

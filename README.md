@@ -55,10 +55,12 @@ docker run --restart=unless-stopped \
 --name derper \
 # -p 80:80 -p 443:443 -p 3478:3478/udp \
 # -e CERT_MODE=manual \
-# -e HOSTNAME="127.0.0.1" \
+# -e HOSTNAME=127.0.0.1 \
 # -e ADDR=:443 \
 # -e STUN_PORT=3478 \
 # -e VERIFY_CLIENTS=true \
+# -e CERT_DIR=derper-certs \
+-v "$(pwd)"/derper-certs/:/root/derper-certs/ \
 -v /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock \
 -d camllia/derper:latest
 # '-v /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock' Not necessary if VERIFY_CLIENTS=false
@@ -71,19 +73,26 @@ services:
     image: camllia/derper
     container_name: derper
     restart: unless-stopped
-    # environment:
-    #   - CERT_MODE=manual     # default
-    #   - HOSTNAME="127.0.0.1" # default
-    #   - ADDR=:443            # default
-    #   - STUN_PORT=3478       # default
-    #   - VERIFY_CLIENTS=true  # default
+    environment:
+    #   - CERT_DIR=derper-certs   # default
+    #   - CERT_MODE=manual        # default
+    #   - HOSTNAME=127.0.0.1      # default
+    #   - ADDR=:443               # default
+    #   - STUN_PORT=3478          # default
+    #   - VERIFY_CLIENTS=true     # default
     ports:
       - "80:80"
       - "443:443"
       - "3478:3478/udp"
     volumes:
+      - ./derper-certs/:/root/derper-certs/ # Match env "CERT_DIR"
       - /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock # Not necessary if VERIFY_CLIENTS=false
 ```
+
+> ~~**THEN** Run `docker logs derper`, copy the displayed "CertName":"sha256-raw:xxx...xxx", and add it to the `Nodes` section within the `derpMap` in ACL policy.~~
+> 
+> **NOTICE**: It is not yet available. You still need to set `"InsecureForTests": true` in the `Nodes` section of the `derpMap` within the ACL policy if you are **using a self-signed certificate**.
+>
 
 ### Custom tailscaled socket path (When VERIFY_CLIENTS=true)
 If `-socket=""`, the system will search for the socket based on the default location defined by the operating system.
