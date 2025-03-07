@@ -30,17 +30,23 @@ This table provides a detailed comparison and command-line parameters for the `d
 | HOSTNAME                   | `-hostname`                              | `127.0.0.1`                           |
 | RUN_STUN                   | `-stun`                                  | `true`                                |
 | RUN_DERP                   | `-derp`                                  | `true`                                |
+| FLAGHOME                   | `-home`                                  | `""`                                  |
 | MESH_PSKFILE               | `-mesh-psk-file`                         | `""`                                  |
 | MESH_WITH                  | `-mesh-with`                             | `""`                                  |
+| SECRETS_URL                | `-secrets-url`                           | `""`                                  |
+| SECRET_PREFIX              | `-secrets-path-prefix`                   | `prod/derp`                           |
+| SECRETS_CACHEDIR           | `-secrets-cache-dir`                     | `derper-secrets`                      |
 | BOOTSTRAP_DNS              | `-bootstrap-dns-names`                   | `""`                                  |
 | UNPUBLISHED_DNS            | `-unpublished-bootstrap-dns-names`       | `""`                                  |
 | VERIFY_CLIENTS             | `-verify-clients`                        | `true`                                |
 | VERIFY_CLIENT_URL          | `-verify-client-url`                     | `""`                                  |
 | VERIFY_FAIL_OPEN           | `-verify-client-url-fail-open`           | `true`                                |
+| SOCKET                     | `-socket`                                | `""`                                  |
 | ACCEPT_CONNECTION_LIMIT    | `-accept-connection-limit`               | `+Inf`                                |
 | ACCEPT_CONNECTION_BURST    | `-accept-connection-burst`               | `9223372036854775807`                 |
 | TCP_KEEPALIVE_TIME         | `-tcp-keepalive-time`                    | `10m0s`                               |
 | TCP_USER_TIMEOUT           | `-tcp-user-timeout`                      | `15s`                                 |
+| TCP_WRITE_TIMEOUT          | `-tcp-write-timeout`                     | `2s`                                  |
 
 ### RUN DERPER
 ```sh
@@ -78,6 +84,43 @@ services:
     volumes:
       - /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock # Not necessary if VERIFY_CLIENTS=false
 ```
+
+### Custom tailscaled socket path (When VERIFY_CLIENTS=true)
+If `-socket=""`, the system will search for the socket based on the default location defined by the operating system.
+
+> FROM [DefaultTailscaledSocket in tailscale.](https://github.com/tailscale/tailscale/blob/e80d2b4ad1e427c7700264a05d4bc8a6d95e29d7/paths/paths.go#L23)
+```go
+// DefaultTailscaledSocket returns the path to the tailscaled Unix socket
+// or the empty string if there's no reasonable default.
+func DefaultTailscaledSocket() string {
+	if runtime.GOOS == "windows" {
+		return `\\.\pipe\ProtectedPrefix\Administrators\Tailscale\tailscaled`
+	}
+	if runtime.GOOS == "darwin" {
+		return "/var/run/tailscaled.socket"
+	}
+	if runtime.GOOS == "plan9" {
+		return "/srv/tailscaled.sock"
+	}
+	switch distro.Get() {
+	case distro.Synology:
+		if distro.DSMVersion() == 6 {
+			return "/var/packages/Tailscale/etc/tailscaled.sock"
+		}
+		// DSM 7 (and higher? or failure to detect.)
+		return "/var/packages/Tailscale/var/tailscaled.sock"
+	case distro.Gokrazy:
+		return "/perm/tailscaled/tailscaled.sock"
+	case distro.QNAP:
+		return "/tmp/tailscale/tailscaled.sock"
+	}
+	if fi, err := os.Stat("/var/run"); err == nil && fi.IsDir() {
+		return "/var/run/tailscale/tailscaled.sock"
+	}
+	return "tailscaled.sock"
+}
+```
+Otherwise, the `SOCKET` environment variable needs to be set manually in docker.
 
 # DERP
 > This section is from Tailscale's README file.
