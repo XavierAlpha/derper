@@ -1,4 +1,4 @@
-name: tailscale derp disable hostname checking
+name: tailscale derper checking
 on:
   workflow_dispatch:
   push:
@@ -19,7 +19,6 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 2
-
       - name: Trigger type
         run: |
           if [ "${{ github.event_name }}" == "workflow_run" ]; then
@@ -30,8 +29,11 @@ jobs:
       - name: Check for derper changes (Only for submodule updates)
         if: env.trigger_type == 'workflow_run'
         run: |
-          git diff HEAD^ HEAD --quiet third_party/tailscale/cmd/derper/ && echo "trigger_deploy=false" >> $GITHUB_ENV || echo "trigger_deploy=true" >> $GITHUB_ENV
-
+          git rev-parse --verify HEAD^ >/dev/null 2>&1 && \
+          (git diff --quiet HEAD^ HEAD -- "third_party/tailscale/cmd/derper/" 2>/dev/null && \
+          echo "trigger_deploy=false" >> $GITHUB_ENV || \
+          ([ $? -eq 1 ] && echo "trigger_deploy=true" || echo "trigger_deploy=false")) || \
+          echo "trigger_deploy=false" >> $GITHUB_ENV
       - name: Deploy if required
         run: |
           if [[ "$trigger_type" == "others" || "$trigger_deploy" == "true" ]]; then
@@ -40,7 +42,6 @@ jobs:
             echo "No deploy needed."
             exit 0
           fi
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
         if: env.trigger_type == 'others' || env.trigger_deploy == 'true'
@@ -60,7 +61,6 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Build and push Docker images to docker.io and ghcr.io
         uses: docker/build-push-action@v6
         if: env.trigger_type == 'others' || env.trigger_deploy == 'true'
