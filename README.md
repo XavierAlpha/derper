@@ -34,7 +34,7 @@ This table provides a detailed comparison and command-line parameters for the `d
 | MESH_PSKFILE               | `-mesh-psk-file`                         | `""`                                  |
 | MESH_WITH                  | `-mesh-with`                             | `""`                                  |
 | SECRETS_URL                | `-secrets-url`                           | `""`                                  |
-| SECRET_PREFIX              | `-secrets-path-prefix`                   | `prod/derp`                           |
+| SECRETS_PREFIX             | `-secrets-path-prefix`                   | `prod/derp`                           |
 | SECRETS_CACHEDIR           | `-secrets-cache-dir`                     | `derper-secrets`                      |
 | BOOTSTRAP_DNS              | `-bootstrap-dns-names`                   | `""`                                  |
 | UNPUBLISHED_DNS            | `-unpublished-bootstrap-dns-names`       | `""`                                  |
