@@ -61,9 +61,9 @@ docker run --restart=unless-stopped \
 # -e VERIFY_CLIENTS=true \
 # -e CERT_DIR=derper-certs \
 -v "$(pwd)"/derper-certs/:/root/derper-certs/ \
--v /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock \
+-v /var/run/tailscale/:/var/run/tailscale/ \
 -d camllia/derper:latest
-# '-v /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock' Not necessary if VERIFY_CLIENTS=false
+# '-v /var/run/tailscale/:/var/run/tailscale/' Not necessary if VERIFY_CLIENTS=false
 ```
 
 ```yml
@@ -86,7 +86,7 @@ services:
       - "3478:3478/udp"
     volumes:
       - ./derper-certs/:/root/derper-certs/ # Match env "CERT_DIR"
-      - /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock # Not necessary if VERIFY_CLIENTS=false
+      - /var/run/tailscale/:/var/run/tailscale/ # (tailscaled.sock in linux) Not necessary if VERIFY_CLIENTS=false
 ```
 
 > ~~**THEN** Run `docker logs derper`, copy the displayed "CertName":"sha256-raw:xxx...xxx", and add it to the `Nodes` section within the `derpMap` in ACL policy.~~
