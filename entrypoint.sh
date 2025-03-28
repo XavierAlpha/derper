@@ -13,35 +13,33 @@ check_cert() {
             exit 1
         else
             echo "$CERT_DIR 文件夹中不存在证书文件。生成自签名证书"
-            CONF_FILE="ASN.conf"
-            echo "[req]
-            default_bits  = 2048
-            distinguished_name = req_distinguished_name
-            req_extensions = req_ext
-            x509_extensions = v3_req
-            prompt = no
+            cat > "$CONF_FILE" <<EOF
+[req]
+default_md = sha256
+prompt = no
+distinguished_name = req_distinguished_name
+req_extensions = v3_req
 
-            [req_distinguished_name]
-            countryName = US
-            stateOrProvinceName = California
-            localityName = Los Angeles
-            organizationName = Self-signed
-            organizationalUnitName = Self-signed
-            commonName = $HOSTNAME
-            emailAddress = admin@$HOSTNAME
+[req_distinguished_name]
+C = US
+ST = California
+L = Los Angeles
+O = Camellia Corp
+OU = Camellia Corp
+CN = ${HOSTNAME}
 
-            [req_ext]
-            subjectAltName = @alt_names
-            
-            [v3_req]
-            subjectAltName = @alt_names
-            
-            [alt_names]
-            IP.1 = $HOSTNAME
-            " > "$CONF_FILE"
-            
+[v3_req]
+basicConstraints = CA:FALSE
+keyUsage = digitalSignature, keyEncipherment
+extendedKeyUsage = serverAuth
+subjectAltName = @alt_names
+
+[alt_names]
+IP.1 = $HOSTNAME
+EOF
             mkdir -p "$CERT_DIR"
-            openssl req -x509 -nodes -quiet -days 730 -newkey rsa:2048 -keyout "$CERT_DIR/$HOSTNAME.key" -out "$CERT_DIR/$HOSTNAME.crt" -config "$CONF_FILE"
+            openssl ecparam -name prime256v1 -genkey -noout -out "$CERT_DIR/$HOSTNAME.key"
+            openssl req -x509 -nodes -new -key "$CERT_DIR/$HOSTNAME.key" -days 365 -out "$CERT_DIR/$HOSTNAME.crt" -config "$CONF_FILE"
         fi
     else
         echo "未知的 CERTMODE 环境变量: $CERT_MODE"
