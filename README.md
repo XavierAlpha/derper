@@ -89,9 +89,9 @@ services:
       - /var/run/tailscale/:/var/run/tailscale/ # (tailscaled.sock in linux) Not necessary if VERIFY_CLIENTS=false
 ```
 
-> ~~**THEN** Run `docker logs derper`, copy the displayed "CertName":"sha256-raw:xxx...xxx", and add it to the `Nodes` section within the `derpMap` in ACL policy.~~
+> **THEN** Run `docker logs derper`, copy the displayed "CertName":"sha256-raw:xxx...xxx", and add it to the `Nodes` section within the `derpMap` in ACL policy.
 > 
-> **NOTICE**: It is not yet available. You still need to set `"InsecureForTests": true` in the `Nodes` section of the `derpMap` within the ACL policy if you are **using a self-signed certificate**.
+> ~~**NOTICE**: It is not yet available. You still need to set `"InsecureForTests": true` in the `Nodes` section of the `derpMap` within the ACL policy if you are **using a self-signed certificate**.~~
 >
 
 ### Custom tailscaled socket path (When VERIFY_CLIENTS=true)

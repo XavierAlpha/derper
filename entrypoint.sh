@@ -13,6 +13,7 @@ check_cert() {
             exit 1
         else
             echo "$CERT_DIR 文件夹中不存在证书文件。生成自签名证书"
+            CONF_FILE="ASN.conf"
             cat > "$CONF_FILE" <<EOF
 [req]
 default_md = sha256
