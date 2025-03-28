@@ -20,6 +20,7 @@ default_md = sha256
 prompt = no
 distinguished_name = req_distinguished_name
 req_extensions = v3_req
+x509_extensions = v3_req
 
 [req_distinguished_name]
 C = US
@@ -27,7 +28,7 @@ ST = California
 L = Los Angeles
 O = Camellia Corp
 OU = Camellia Corp
-CN = ${HOSTNAME}
+CN = $HOSTNAME
 
 [v3_req]
 basicConstraints = CA:FALSE
@@ -40,7 +41,7 @@ IP.1 = $HOSTNAME
 EOF
             mkdir -p "$CERT_DIR"
             openssl ecparam -name prime256v1 -genkey -noout -out "$CERT_DIR/$HOSTNAME.key"
-            openssl req -x509 -nodes -new -key "$CERT_DIR/$HOSTNAME.key" -days 365 -out "$CERT_DIR/$HOSTNAME.crt" -config "$CONF_FILE"
+            openssl req -x509 -nodes -new -key "$CERT_DIR/$HOSTNAME.key" -days 365 -out "$CERT_DIR/$HOSTNAME.crt" -config "$CONF_FILE" -extensions v3_req
         fi
     else
         echo "未知的 CERTMODE 环境变量: $CERT_MODE"
