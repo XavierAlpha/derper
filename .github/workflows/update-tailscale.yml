@@ -18,14 +18,31 @@ jobs:
 
       - name: Update
         run: |
-          git submodule update --remote --recursive
+          OLD_SHA=$(git rev-parse HEAD:third_party/tailscale)
+          echo "Tailscale before update: $OLD_SHA"
+
+          git submodule update --remote --init --recursive
+
+          NEW_SHA=$(git rev-parse HEAD:third_party/tailscale)
+          echo "Tailscale after update:  $NEW_SHA"
+
           if git diff --exit-code; then
-            echo "No changes to commit."
-          else
-            git config --global user.name "Gitbot"
-            git config --global user.email "bot@noreply.github.com"
-            git commit -am "Update tailscale to latest commit"
-            git push origin "${{ github.ref }}"
+            echo "No submodule changes; nothing to do."
+            exit 0
           fi
+
+          git config --global user.name "Gitbot"
+          git config --global user.email "bot@noreply.github.com"
+          git commit -am "Update tailscale to to $NEW_SHA"
+          git push origin "${{ github.ref }}"
+
+          if git diff --quiet "$OLD_SHA" "$NEW_SHA" -- third_party/tailscale/cmd/derper; then
+            FLAG=0
+          else
+            FLAG=1
+          fi
+          echo "derper changed? $FLAG"
+          git tag -f -a derper-changed -m "$FLAG"
+          git push -f origin refs/tags/derper-changed
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

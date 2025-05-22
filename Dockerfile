@@ -1,10 +1,28 @@
 FROM golang:alpine AS builder
 LABEL org.opencontainers.image.authors="Camellia Corp."
 WORKDIR /root
-ADD third_party/tailscale /root/tailscale
-RUN cd /root/tailscale/cmd/derper && \
-    CGO_ENABLED=0 go build -trimpath -buildvcs=false -ldflags "-s -w -buildid=" -o /root/derper && \
-    cd /root && rm -rf /root/tailscale
+COPY . /root/
+SHELL ["/bin/sh","-euxc"]
+RUN \
+  apk update && apk add --no-cache git && \
+  cd /root/third_party/tailscale && \
+  git switch --detach "$(git tag -l | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -Vr | head -n1)" && \
+  eval "$(CGO_ENABLED=0 \
+           GOOS=$(go env GOHOSTOS) \
+           GOARCH=$(go env GOHOSTARCH) \
+           go run ./cmd/mkversion --export)" && \
+  default_tags="ts_cmd_derper,v${VERSION_SHORT},v${VERSION_MINOR}" && \
+  tags="${tags:-${default_tags}}" && \
+  ldflags="\
+    -X tailscale.com/version.shortStamp=${VERSION_SHORT} \
+    -X tailscale.com/version.longStamp=${VERSION_LONG} \
+    -X tailscale.com/version.gitCommitStamp=${VERSION_GIT_HASH}" && \
+  cd cmd/derper && \
+  CGO_ENABLED=0 GOOS=$(go env GOHOSTOS) GOARCH=$(go env GOHOSTARCH) \
+  go build -trimpath -buildvcs=true \
+    -tags="$tags" \
+    -ldflags="$ldflags -s -w" \
+    -o /root/derper .
 
 FROM alpine:latest
 WORKDIR /root
