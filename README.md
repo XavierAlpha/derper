@@ -1,17 +1,20 @@
 # DERP in Docker
 
 ## How To Use
-> Image Source: camllia/derper:latest OR ghcr.io/xavieralpha/derper:latest
-
+> Image Source: camllia/derper:latest(nightly) OR ghcr.io/xavieralpha/derper:latest(nightly)
 
 ```sh
 # install tailscale if VERIFY_CLIENTS=true; otherwise, ignore it.
 curl -fsSL https://tailscale.com/install.sh | sh
 
-# if /bin/sh
-docker pull camllia/derper:latest
-docker run --rm -it camllia/derper /bin/sh
+# check version
+docker pull camllia/derper:latest or camllia/derper:nightly
+docker run --rm -it camllia/derper:latest derper --version
 ```
+## TAGS
+> The 'latest' tag—as well as semantic-version tags like 'vX.Y.Z' — tracks the official Tailscale release versions.
+>
+> The 'nightly' tag, along with tags formatted as commit hashes (e.g. '980ab4244'), follows the most recent daily commits.
 
 ### DERP Server Environment Variables and Parameter Comparison Table
 
@@ -94,7 +97,7 @@ services:
 > ~~**NOTICE**: It is not yet available. You still need to set `"InsecureForTests": true` in the `Nodes` section of the `derpMap` within the ACL policy if you are **using a self-signed certificate**.~~
 >
 
-### Custom tailscaled socket path (When VERIFY_CLIENTS=true)
+### Custom tailscaled socket path (VERIFY_CLIENTS=true)
 If `-socket=""`, the system will search for the socket based on the default location defined by the operating system.
 
 > FROM [DefaultTailscaledSocket in tailscale.](https://github.com/tailscale/tailscale/blob/e80d2b4ad1e427c7700264a05d4bc8a6d95e29d7/paths/paths.go#L23)

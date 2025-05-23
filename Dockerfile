@@ -6,7 +6,6 @@ SHELL ["/bin/sh","-euxc"]
 RUN \
   apk update && apk add --no-cache git && \
   cd /root/third_party/tailscale && \
-  git switch --detach "$(git tag -l | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -Vr | head -n1)" && \
   eval "$(CGO_ENABLED=0 \
            GOOS=$(go env GOHOSTOS) \
            GOARCH=$(go env GOHOSTARCH) \

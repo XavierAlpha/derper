@@ -12,7 +12,10 @@ on:
     types:
       - completed
 jobs:
-  deploy:
+  build-publish:
+    strategy:
+      matrix:
+        channel: [latest, nightly]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,7 +33,7 @@ jobs:
         if: env.trigger_type == 'workflow_run'
         run: |
           git fetch origin tag derper-changed --no-tags || true
-          if git show-ref --tags derper-changed >/dev/null 2>&1; then
+          if git show-ref --tags derper-changed > /dev/null 2>&1; then
             FLAG=$(git for-each-ref --format='%(contents)' refs/tags/derper-changed)
           else
             FLAG=0
@@ -44,6 +47,23 @@ jobs:
           else
             echo "No deploy needed."
             exit 0
+          fi
+      - name: Select version
+        run: |
+          if [[ "$trigger_type" == "others" || "$trigger_deploy" == "1" ]]; then
+            if [[ "${{ matrix.channel }}" == "latest" ]]; then
+              TAG=$(git -C third_party/tailscale tag -l \
+                    | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' \
+                    | sort -Vr | head -n1)
+              git -C third_party/tailscale switch --detach "$TAG"
+              echo "IMAGE_TAG=latest"  >> $GITHUB_ENV
+              echo "EXTRA_TAG=$TAG"    >> $GITHUB_ENV
+            else
+              git -C third_party/tailscale switch --detach main
+              SHA=$(git -C third_party/tailscale rev-parse --short HEAD)
+              echo "IMAGE_TAG=nightly" >> $GITHUB_ENV
+              echo "EXTRA_TAG=$SHA"    >> $GITHUB_ENV
+            fi
           fi
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -72,6 +92,6 @@ jobs:
           context: .
           push: true
           tags: |
-            camllia/derper:latest
-            camllia/derper:${{github.sha}}
-            ghcr.io/xavieralpha/derper:latest
+            camllia/derper:${{ env.IMAGE_TAG }}
+            camllia/derper:${{ env.EXTRA_TAG }}
+            ghcr.io/xavieralpha/derper:${{ env.IMAGE_TAG }}

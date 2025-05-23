@@ -1,3 +1,4 @@
 [submodule "third_party/tailscale"]
 	path = third_party/tailscale
 	url = https://github.com/tailscale/tailscale.git
+	branch = main
