@@ -18,10 +18,10 @@ jobs:
 
       - name: Update
         run: |
-          OLD_SHA=$(git ls-tree --format='%(objectname:short)' HEAD third_party/tailscale)
+          OLD_SHA=$(git -C third_party/tailscale rev-parse --short HEAD)
           echo "Tailscale before update: $OLD_SHA"
           git submodule update --remote --recursive third_party/tailscale
-          NEW_SHA=$(git ls-tree --format='%(objectname:short)' HEAD third_party/tailscale)
+          NEW_SHA=$(git -C third_party/tailscale rev-parse --short main)
           echo "Tailscale after update:  $NEW_SHA"
           if git diff --exit-code; then
             echo "No submodule changes; nothing to do."
