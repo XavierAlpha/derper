@@ -31,9 +31,9 @@ jobs:
           git config --global user.email "bot@noreply.github.com"
           git commit -am "Update tailscale to $NEW_SHA"
           git push origin "${{ github.ref_name }}"
-          FLAG=0
-          git -C third_party/tailscale/ diff --exit-code "$OLD_SHA" "$NEW_SHA" -- cmd/derper
-          if [ $? -eq 1 ]; then
+          if git -C third_party/tailscale diff --exit-code "$OLD_SHA" "$NEW_SHA" -- cmd/derper; then
+            FLAG=0
+          else
             FLAG=1
           fi
           echo "Derper changed? $FLAG"
