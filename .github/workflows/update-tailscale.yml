@@ -24,7 +24,10 @@ jobs:
           NEW_SHA=$(git -C third_party/tailscale rev-parse --short main)
           echo "Tailscale after update:  $NEW_SHA"
           if git diff --exit-code; then
-            echo "No submodule changes; nothing to do."
+            FLAG=0
+            echo "No submodule changes; Restore FLAG."
+            git tag -f -a derper-changed -m "$FLAG"
+            git push -f origin refs/tags/derper-changed
             exit 0
           fi
           git config --global user.name "gitbot"
