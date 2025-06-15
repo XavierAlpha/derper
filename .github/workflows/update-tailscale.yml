@@ -26,6 +26,8 @@ jobs:
           if git diff --exit-code; then
             FLAG=0
             echo "No submodule changes; Restore FLAG."
+            git config --global user.name "gitbot"
+            git config --global user.email "bot@noreply.github.com"
             git tag -f -a derper-changed -m "$FLAG"
             git push -f origin refs/tags/derper-changed
             exit 0
